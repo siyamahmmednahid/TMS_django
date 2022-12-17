@@ -6,6 +6,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from .serializers import *
 from .models import *
+# from rest_framework import viewsets
 
 
 
@@ -14,13 +15,16 @@ from .models import *
 # Users List API
 class UserListAPI(ListAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = UsersSerializer
     queryset = User.objects.all()
+    serializer_class = UsersSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = User.objects.all()
         serializer = UsersSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+
 
 
 

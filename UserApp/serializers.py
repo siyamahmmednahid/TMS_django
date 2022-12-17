@@ -11,23 +11,15 @@ class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         field = '__all__'
-        exclude = ['password', 'is_superuser', 'is_staff', 'is_active', 'date_joined', 'last_login', 'groups', 'user_permissions']
+        exclude = ['password', 'is_superuser', 'is_staff', 'date_joined', 'last_login', 'groups', 'user_permissions']
 
 
 # For user detail serializer
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name']
+        fields = ['email', 'first_name', 'last_name']
 
-
-
-
-# For user all info serializer
-class UserAllInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = '__all__'
 
 
 
