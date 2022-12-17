@@ -9,11 +9,19 @@ from .models import *
 
 
 
+
+
 # Users List API
-class UserListApi(ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UsersSerializer
+class UserListAPI(ListAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = UsersSerializer
+    queryset = User.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = UsersSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 
 # User Detail API

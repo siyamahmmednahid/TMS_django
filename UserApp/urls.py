@@ -2,7 +2,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', UserListApi.as_view()),
+    path('', UserListAPI.as_view()),
     path('<int:pk>/', UserDetailApi.as_view()),
 
 
