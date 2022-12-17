@@ -8,4 +8,5 @@ urlpatterns = [
     path('signup/', UserSignUpApi.as_view()),
     path('change-password/', ChangePasswordApi.as_view()),
     # path('forgot-password/', UserPasswordForgotApi.as_view()),
+    path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 ]
