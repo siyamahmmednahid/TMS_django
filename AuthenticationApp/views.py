@@ -3,61 +3,15 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import generics
-from rest_framework import status
-from .serializers import *
 from django.contrib.auth.models import User
+from django_rest_passwordreset.views import ResetPasswordRequestToken
 
 
-
-# For User Sign Up API
-class UserSignUpApi(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request, format=None):
-        data = request.data
-        username = data['username']
-        email = data['email']
-        password1 = data['password1']
-        password2 = data['password2']
-
-        if request.user.is_superuser:
-            if User.objects.filter(username=username).exists():
-                return Response({
-                    'status': False,
-                    'message': 'Username already exists'
-                })
-            elif User.objects.filter(email=email).exists():
-                return Response({
-                    'status': False,
-                    'message': 'Email already exists'
-                })
-            elif password1 != password2:
-                return Response({
-                    'status': False,
-                    'message': 'Password does not match'
-                })
-            else:
-                user = User.objects.create_user(username=username, email=email, password=password1)
-                user.save()
-                return Response({
-                    'status': True,
-                    'message': 'User created successfully',
-                    'data': {
-                        'username': username,
-                        'email': email,
-                        'password': password1
-                    }
-                })
-        else:
-            return Response({
-                    'status': False,
-                    'message': 'You are not authorized to create a user'
-                })
 
 
 
 # For User Sign In API
-class UserSignInApi(TokenObtainPairView):
+class UserSignInAPI(TokenObtainPairView):
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):
@@ -88,129 +42,123 @@ class UserSignInApi(TokenObtainPairView):
             else:
                 return Response({
                     'status': False,
-                    'message': 'Wrong password'
+                    'message': 'Wrong credentials'
                 })
         else:
             return Response({
                 'status': False,
-                'message': 'Wrong username'
+                'message': 'Wrong credentials'
             })
 
 
 
 
 
-# For Change Password API
-class ChangePasswordApi(generics.UpdateAPIView):
+# For User Sign Up API
+class UserSignUpAPI(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
-    model = User
-    serializer_class = ChangePasswordSerializer
+    queryset = User.objects.all()
 
-    def get_object(self, queryset = None):
-        obj = self.request.user
-        return obj
+    def post(self, request, format=None):
+        data = request.data
+        username = data['username']
+        email = data['email']
+        password1 = data['password1']
+        password2 = data['password2']
 
+        def validate_password(password):
+            if len(password) < 8:
+                return False
+            if password.isnumeric():
+                return False
+            if password.isalpha():
+                return False
+            return True
 
-    def update(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            if not self.object.check_password(serializer.data.get("old_password")):
-                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
-            self.object.set_password(serializer.data.get("new_password"))
-            self.object.save()
-            response = {
-                'status': 'success',
-                'code': status.HTTP_200_OK,
-                'message': 'Password updated successfully',
-                'data': {
-                    'id': self.object.id,
-                    'username': self.object.username,
-                    'email': self.object.email,
-                    'first_name': self.object.first_name,
-                    'last_name': self.object.last_name,
-                    'is_active': self.object.is_active,
-                    'is_staff': self.object.is_staff,
-                    'is_superuser': self.object.is_superuser,
-                    'password': serializer.data.get("new_password")
-                }
-            }
-
-            return Response(response)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-# For User Password Forgot API
-
-
-
-
-
-
-
-
-
-# User Registration API
-# class UserRegistrationApi(APIView):
-#     permission_classes = [AllowAny]
-#     def post(self, request, format=None):
-#         username = request.data['username']
-#         first_name = request.data['first_name']
-#         last_name = request.data['last_name']
-#         email = request.data['email']
-#         password1 = request.data['password1']
-#         password2 = request.data['password2']
-
-#         if User.objects.filter(username=username).exists():
-#             return Response({'status': False,'message': 'Username already exists'})
-#         elif User.objects.filter(email=email).exists():
-#             return Response({'status': False,'message': 'Email already exists'})
-#         elif password1 != password2:
-#             return Response({'status': False,'message': 'Passwords do not match'})
-#         else:
-#             user = User()
-#             user.username = username
-#             user.first_name = first_name
-#             user.last_name = last_name
-#             user.email = email
-#             user.is_active = True
-#             user.set_password(password1)
-#             user.save()
-#             return Response(
-#                 {
-#                     'status': True, 
-#                     'message': 'User created successfully', 
-#                     'data': {
-#                         'username': username, 
-#                         'password': password1
-#                     }
-#                 }
-#             )
+        if request.user.is_superuser:
+            if User.objects.filter(username=username).exists():
+                return Response({
+                    'status': False,
+                    'message': 'Username already exists'
+                })
+            elif User.objects.filter(email=email).exists():
+                return Response({
+                    'status': False,
+                    'message': 'Email already exists'
+                })
+            elif not validate_password(password1):
+                return Response({
+                    'status': False,
+                    'message': 'Password must be at least 8 characters long and must contain at least one letter and one number'
+                })
+            elif password1 != password2:
+                return Response({
+                    'status': False,
+                    'message': 'Password does not match'
+                })
+            else:
+                user = User.objects.create_user(username=username, email=email, password=password1)
+                user.save()
+                return Response({
+                    'status': True,
+                    'message': 'User created successfully',
+                    'data': {
+                        'username': username,
+                        'email': email,
+                        'password': password1
+                    }
+                })
+        else:
+            return Response({
+                    'status': False,
+                    'message': 'You are not authorized to create a user'
+                })
 
 
 
-# User Sign In API
-# class SingInAPI(TokenObtainPairView):
-#     permission_classes = [AllowAny]
-#     def post(self, request, *args, **kwargs):
-#         response = super().post(request, *args, **kwargs)
-#         data = response.data
-#         data['user_id'] = User.objects.get(username=request.data['username']).id
-#         data['username'] = request.data['username']
-#         data['first_name'] = User.objects.get(username=request.data['username']).first_name
-#         data['last_name'] = User.objects.get(username=request.data['username']).last_name
-#         data['email'] = User.objects.get(username=request.data['username']).email
-#         data['is_active'] = User.objects.get(username=request.data['username']).is_active
-#         data['is_staff'] = User.objects.get(username=request.data['username']).is_staff
-#         data['is_superuser'] = User.objects.get(username=request.data['username']).is_superuser
-#         return Response(
-#             {
-#                 'status': True,
-#                 'message': 'User logged in successfully',
-#                 'data': data
-#             }
-#         )
+
+
+# For Change Password API
+class ChangePasswordAPI(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+
+    def put(self, request, format=None):
+        data = request.data
+        old_password = data['old_password']
+        new_password1 = data['new_password1']
+        new_password2 = data['new_password2']
+
+        def validate_password(password):
+            if len(password) < 8:
+                return False
+            if password.isnumeric():
+                return False
+            if password.isalpha():
+                return False
+            return True
+
+        if request.user.check_password(old_password):
+            if not validate_password(new_password1):
+                return Response({
+                    'status': False,
+                    'message': 'Password must be at least 8 characters long and must contain at least one letter and one number'
+                })
+            elif new_password1 != new_password2:
+                return Response({
+                    'status': False,
+                    'message': 'Password does not match'
+                })
+            else:
+                user = User.objects.get(username=request.user.username)
+                user.set_password(new_password1)
+                user.save()
+                return Response({
+                    'status': True,
+                    'message': 'Password changed successfully'
+                })
+        else:
+            return Response({
+                'status': False,
+                'message': 'Wrong credentials'
+            })
