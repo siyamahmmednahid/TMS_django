@@ -21,6 +21,7 @@ class UserListAPI(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = User.objects.all()
         serializer = UsersSerializer(queryset, many=True)
+        
         return Response(serializer.data)
 
 
