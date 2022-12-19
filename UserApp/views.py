@@ -17,12 +17,20 @@ class UserListAPI(ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-
+    
     def list(self, request, *args, **kwargs):
-        queryset = User.objects.all()
-        serializer = UsersSerializer(queryset, many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        personalInfoSerializer = PersonalInfoDetailSerializer(PersonalInfo.objects.all(), many=True)
+
+        if serializer.data:
+            for data in serializer.data:
+                for personalInfo in personalInfoSerializer.data:
+                    if data['id'] == personalInfo['user']:
+                        data['personal_info'] = personalInfo
+            return Response(serializer.data)
+
         
-        return Response(serializer.data)
+    
 
 
 

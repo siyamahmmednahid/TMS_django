@@ -5,8 +5,7 @@ import uuid
 
 # For user personal info model
 class PersonalInfo(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='personal_info')
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='user')
     ProfilePic = models.ImageField(upload_to='profile_pics', blank=True)
     EmployeeID = models.CharField(max_length=10, blank=True)
     Phone = models.CharField(max_length=11, blank=True)
