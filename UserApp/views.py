@@ -29,10 +29,6 @@ class UserListAPI(ListAPIView):
                         data['personal_info'] = personalInfo
             return Response(serializer.data)
 
-        
-    
-
-
 
 
 
@@ -63,7 +59,6 @@ class UserDetailApi(RetrieveUpdateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'You are not authorized to update this user'}, status=status.HTTP_401_UNAUTHORIZED)
-
         
 
 
