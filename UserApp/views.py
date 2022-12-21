@@ -6,7 +6,6 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from .serializers import *
 from .models import *
-# from rest_framework import viewsets
 
 
 
@@ -116,12 +115,8 @@ class UserAcademicInfoListCreateAPI(ListCreateAPIView):
     queryset = AcademicInfo.objects.all()
     serializer_class = AcademicInfoSerializer
 
-    def get_queryset(self):
-        user = self.request.user
-        return AcademicInfo.objects.filter(user=user)
-
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = AcademicInfo.objects.all()
         serializer = AcademicInfoDetailSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -150,11 +145,15 @@ class UserAcademicInfoAPI(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = AcademicInfoSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': True, 'message': 'Academic info updated successfully', 'data': serializer.data})
+
+        if request.user == instance.user:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': True, 'message': 'Academic info updated successfully', 'data': serializer.data})
+            else:
+                return Response({'status': False, 'message': 'Academic info not updated', 'data': serializer.errors})
         else:
-            return Response({'status': False, 'message': 'Academic info not updated', 'data': serializer.errors})
+            return Response({'status': False, 'message': 'You are not authorized to update this academic info'})
 
 
 
@@ -166,12 +165,8 @@ class UserTrainingInfoListCreateAPI(ListCreateAPIView):
     serializer_class = TrainingInfoSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return TrainingInfo.objects.filter(user=user)
-
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = TrainingInfo.objects.all()
         serializer = TrainingInfoDetailSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -200,11 +195,15 @@ class UserTrainingInfoAPI(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = TrainingInfoSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': True, 'message': 'Training info updated successfully', 'data': serializer.data})
+
+        if request.user == instance.user:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': True, 'message': 'Training info updated successfully', 'data': serializer.data})
+            else:
+                return Response({'status': False, 'message': 'Training info not updated', 'data': serializer.errors})
         else:
-            return Response({'status': False, 'message': 'Training info not updated', 'data': serializer.errors})
+            return Response({'status': False, 'message': 'You are not authorized to update this training info'})
 
 
 
@@ -215,10 +214,6 @@ class UserTeachingInfoListCreateAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = TeachingInfo.objects.all()
     serializer_class = TeachingInfoSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return TeachingInfo.objects.filter(user=user)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -250,12 +245,15 @@ class UserTeachingInfoAPI(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = TeachingInfoSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': True, 'message': 'Teaching info updated successfully', 'data': serializer.data})
-        else:
-            return Response({'status': False, 'message': 'Teaching info not updated', 'data': serializer.errors})
 
+        if request.user == instance.user:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': True, 'message': 'Teaching info updated successfully', 'data': serializer.data})
+            else:
+                return Response({'status': False, 'message': 'Teaching info not updated', 'data': serializer.errors})
+        else:
+            return Response({'status': False, 'message': 'You are not authorized to update this teaching info'})
 
 
 
@@ -265,10 +263,6 @@ class UserPublicationInfoListCreateAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = PublicationInfo.objects.all()
     serializer_class = PublicationInfoSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return PublicationInfo.objects.filter(user=user)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -300,11 +294,15 @@ class UserPublicationInfoAPI(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = PublicationInfoSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': True, 'message': 'Publication info updated successfully', 'data': serializer.data})
+
+        if request.user == instance.user:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': True, 'message': 'Publication info updated successfully', 'data': serializer.data})
+            else:
+                return Response({'status': False, 'message': 'Publication info not updated', 'data': serializer.errors})
         else:
-            return Response({'status': False, 'message': 'Publication info not updated', 'data': serializer.errors})
+            return Response({'status': False, 'message': 'You are not authorized to update this publication info'})
 
 
 
@@ -315,10 +313,6 @@ class UserAwardAndScholarshipInfoListCreateAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = AwardAndScholarshipInfo.objects.all()
     serializer_class = AwardAndScholarshipInfoSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return AwardAndScholarshipInfo.objects.filter(user=user)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -350,11 +344,15 @@ class UserAwardAndScholarshipInfoAPI(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = AwardAndScholarshipInfoSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': True, 'message': 'Award and scholarship info updated successfully', 'data': serializer.data})
+
+        if request.user == instance.user:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': True, 'message': 'Award and scholarship info updated successfully', 'data': serializer.data})
+            else:
+                return Response({'status': False, 'message': 'Award and scholarship info not updated', 'data': serializer.errors})
         else:
-            return Response({'status': False, 'message': 'Award and scholarship info not updated', 'data': serializer.errors})
+            return Response({'status': False, 'message': 'You are not authorized to update this award and scholarship info'})
 
 
 
@@ -365,10 +363,6 @@ class UserExperienceInfoListCreateAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = ExperienceInfo.objects.all()
     serializer_class = ExperienceInfoSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return ExperienceInfo.objects.filter(user=user)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -400,8 +394,12 @@ class UserExperienceInfoAPI(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = ExperienceInfoSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': True, 'message': 'Experience info updated successfully', 'data': serializer.data})
+
+        if request.user == instance.user:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': True, 'message': 'Experience info updated successfully', 'data': serializer.data})
+            else:
+                return Response({'status': False, 'message': 'Experience info not updated', 'data': serializer.errors})
         else:
-            return Response({'status': False, 'message': 'Experience info not updated', 'data': serializer.errors})
+            return Response({'status': False, 'message': 'You are not authorized to update this experience info'})

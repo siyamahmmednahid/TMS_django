@@ -88,6 +88,8 @@ class TeachingInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     CourseCode = models.CharField(max_length=10, blank=True)
     CourseTitle = models.CharField(max_length=50, blank=True)
+    Credit = models.CharField(max_length=2, blank=True)
+    Semester = models.CharField(max_length=10, blank=True)
 
     def __str__(self):
         return self.user.username
