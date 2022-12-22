@@ -1,8 +1,6 @@
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, RetrieveAPIView
-from rest_framework import status
+from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
 from django.contrib.auth.models import User
 from .serializers import *
 from .models import *
@@ -29,9 +27,6 @@ class UserListAPI(ListAPIView):
             return Response(serializer.data)
 
 
-
-
-
 # User Detail API
 class UserDetailApi(RetrieveUpdateAPIView):
     queryset = User.objects.all()
@@ -46,18 +41,15 @@ class UserDetailApi(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = UserDetailSerializer(instance, data=request.data)
+        returnSerializer = UsersSerializer(instance)
         if request.user == instance:
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        elif request.user.is_superuser:
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'status': True, 'message': 'User updated successfully', 'data': returnSerializer.data})
+            else:
+                return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
         else:
-            return Response({'error': 'You are not authorized to update this user'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'status': False, 'message': 'You are not authorized to update this user'})
         
 
 
@@ -99,11 +91,14 @@ class UserPersonalInfoAPI(RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = PersonalInfoSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': True, 'message': 'Personal info updated successfully', 'data': serializer.data})
+        if request.user == instance.user:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': True, 'message': 'Personal info updated successfully', 'data': serializer.data})
+            else:
+                return Response({'status': False, 'message': 'Personal info not updated', 'data': serializer.errors})
         else:
-            return Response({'status': False, 'message': 'Personal info not updated', 'data': serializer.errors})
+            return Response({'status': False, 'message': 'You are not authorized to update this personal info'})
 
 
 
@@ -132,7 +127,7 @@ class UserAcademicInfoListCreateAPI(ListCreateAPIView):
 
 
 # User academic info detail and update API
-class UserAcademicInfoAPI(RetrieveUpdateAPIView):
+class UserAcademicInfoAPI(RetrieveUpdateDestroyAPIView):
     queryset = AcademicInfo.objects.all()
     serializer_class = AcademicInfoDetailSerializer
     permission_classes = [IsAuthenticated]
@@ -154,6 +149,14 @@ class UserAcademicInfoAPI(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'Academic info not updated', 'data': serializer.errors})
         else:
             return Response({'status': False, 'message': 'You are not authorized to update this academic info'})
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            instance.delete()
+            return Response({'status': True, 'message': 'Academic info deleted successfully'})
+        else:
+            return Response({'status': False, 'message': 'You are not authorized to delete this academic info'})
 
 
 
@@ -182,7 +185,7 @@ class UserTrainingInfoListCreateAPI(ListCreateAPIView):
 
 
 # User training info detail and update API
-class UserTrainingInfoAPI(RetrieveUpdateAPIView):
+class UserTrainingInfoAPI(RetrieveUpdateDestroyAPIView):
     queryset = TrainingInfo.objects.all()
     serializer_class = TrainingInfoDetailSerializer
     permission_classes = [IsAuthenticated]
@@ -204,6 +207,14 @@ class UserTrainingInfoAPI(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'Training info not updated', 'data': serializer.errors})
         else:
             return Response({'status': False, 'message': 'You are not authorized to update this training info'})
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            instance.delete()
+            return Response({'status': True, 'message': 'Training info deleted successfully'})
+        else:
+            return Response({'status': False, 'message': 'You are not authorized to delete this training info'})
 
 
 
@@ -232,7 +243,7 @@ class UserTeachingInfoListCreateAPI(ListCreateAPIView):
 
     
 # User teaching info detail API
-class UserTeachingInfoAPI(RetrieveUpdateAPIView):
+class UserTeachingInfoAPI(RetrieveUpdateDestroyAPIView):
     queryset = TeachingInfo.objects.all()
     serializer_class = TeachingInfoDetailSerializer
     permission_classes = [IsAuthenticated]
@@ -254,6 +265,14 @@ class UserTeachingInfoAPI(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'Teaching info not updated', 'data': serializer.errors})
         else:
             return Response({'status': False, 'message': 'You are not authorized to update this teaching info'})
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            instance.delete()
+            return Response({'status': True, 'message': 'Teaching info deleted successfully'})
+        else:
+            return Response({'status': False, 'message': 'You are not authorized to delete this teaching info'})
 
 
 
@@ -281,7 +300,7 @@ class UserPublicationInfoListCreateAPI(ListCreateAPIView):
 
 
 # User publication info detail and update API
-class UserPublicationInfoAPI(RetrieveUpdateAPIView):
+class UserPublicationInfoAPI(RetrieveUpdateDestroyAPIView):
     queryset = PublicationInfo.objects.all()
     serializer_class = PublicationInfoDetailSerializer
     permission_classes = [IsAuthenticated]
@@ -303,6 +322,14 @@ class UserPublicationInfoAPI(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'Publication info not updated', 'data': serializer.errors})
         else:
             return Response({'status': False, 'message': 'You are not authorized to update this publication info'})
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            instance.delete()
+            return Response({'status': True, 'message': 'Publication info deleted successfully'})
+        else:
+            return Response({'status': False, 'message': 'You are not authorized to delete this publication info'})
 
 
 
@@ -331,7 +358,7 @@ class UserAwardAndScholarshipInfoListCreateAPI(ListCreateAPIView):
 
 
 # User award and scholarship info detail and update API
-class UserAwardAndScholarshipInfoAPI(RetrieveUpdateAPIView):
+class UserAwardAndScholarshipInfoAPI(RetrieveUpdateDestroyAPIView):
     queryset = AwardAndScholarshipInfo.objects.all()
     serializer_class = AwardAndScholarshipInfoDetailSerializer
     permission_classes = [IsAuthenticated]
@@ -353,6 +380,14 @@ class UserAwardAndScholarshipInfoAPI(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'Award and scholarship info not updated', 'data': serializer.errors})
         else:
             return Response({'status': False, 'message': 'You are not authorized to update this award and scholarship info'})
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            instance.delete()
+            return Response({'status': True, 'message': 'Award and scholarship info deleted successfully'})
+        else:
+            return Response({'status': False, 'message': 'You are not authorized to delete this award and scholarship info'})
 
 
 
@@ -381,7 +416,7 @@ class UserExperienceInfoListCreateAPI(ListCreateAPIView):
 
 
 # User experience info detail and update API
-class UserExperienceInfoAPI(RetrieveUpdateAPIView):
+class UserExperienceInfoAPI(RetrieveUpdateDestroyAPIView):
     queryset = ExperienceInfo.objects.all()
     serializer_class = ExperienceInfoDetailSerializer
     permission_classes = [IsAuthenticated]
@@ -403,3 +438,11 @@ class UserExperienceInfoAPI(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'Experience info not updated', 'data': serializer.errors})
         else:
             return Response({'status': False, 'message': 'You are not authorized to update this experience info'})
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user == instance.user:
+            instance.delete()
+            return Response({'status': True, 'message': 'Experience info deleted successfully'})
+        else:
+            return Response({'status': False, 'message': 'You are not authorized to delete this experience info'})
