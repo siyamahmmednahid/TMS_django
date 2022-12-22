@@ -35,8 +35,8 @@ class UserDetailApi(RetrieveUpdateAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        serializer = UsersSerializer(instance)
+        return Response({'status': True, 'message': 'User detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -50,6 +50,7 @@ class UserDetailApi(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
         else:
             return Response({'status': False, 'message': 'You are not authorized to update this user'})
+
         
 
 
