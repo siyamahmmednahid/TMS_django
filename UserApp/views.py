@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
 from django.contrib.auth.models import User
 from .serializers import *
@@ -24,32 +25,69 @@ class UserListAPI(ListAPIView):
                 for personalInfo in personalInfoSerializer.data:
                     if data['id'] == personalInfo['user']:
                         data['personal_info'] = personalInfo
-            return Response(serializer.data)
+            return Response({'status': True, 'message': 'Users list', 'data': serializer.data})
+        else:
+            return Response({'status': False, 'message': 'No user found'})
 
 
 # User Detail API
-class UserDetailApi(RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserDetailSerializer
+# class UserDetailApi(RetrieveUpdateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserDetailSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def retrieve(self, request, *args, **kwargs):
+#         instance = self.get_object()
+#         serializer = UsersSerializer(instance)
+#         return Response({'status': True, 'message': 'User detail', 'data': serializer.data})
+
+#     def update(self, request, *args, **kwargs):
+#         instance = self.get_object()
+#         serializer = UserDetailSerializer(instance, data=request.data)
+#         returnSerializer = UsersSerializer(instance)
+        
+#         if request.user == instance:
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response({'status': True, 'message': 'User updated successfully', 'data': returnSerializer.data})
+#             else:
+#                 return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
+#         else:
+#             return Response({'status': False, 'message': 'You are not authorized to update this user'})
+class UserDetailApi(APIView):
     permission_classes = [IsAuthenticated]
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = UsersSerializer(instance)
-        return Response({'status': True, 'message': 'User detail', 'data': serializer.data})
+    def get(self, request, pk):
+        try:
+            user = User.objects.get(id=pk)
+            serializer = UsersSerializer(user)
+            personalInfoSerializer = PersonalInfoDetailSerializer(PersonalInfo.objects.get(user=user))
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = UserDetailSerializer(instance, data=request.data)
-        returnSerializer = UsersSerializer(instance)
-        if request.user == instance:
-            if serializer.is_valid():
-                serializer.save()
-                return Response({'status': True, 'message': 'User updated successfully', 'data': returnSerializer.data})
+            if serializer.data:
+                serializer.data['personal_info'] = personalInfoSerializer.data
+                return Response({'status': True, 'message': 'User detail', 'data': serializer.data})
             else:
-                return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
-        else:
-            return Response({'status': False, 'message': 'You are not authorized to update this user'})
+                return Response({'status': False, 'message': 'No user found'})
+        except User.DoesNotExist:
+            return Response({'status': False, 'message': 'No user found'})
+
+    def put(self, request, pk):
+        try:
+            user = User.objects.get(id=pk)
+            serializer = UserDetailSerializer(user, data=request.data)
+            returnSerializer = UsersSerializer(user)
+
+            if request.user == user:
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({'status': True, 'message': 'User updated successfully', 'data': returnSerializer.data})
+                else:
+                    return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
+            else:
+                return Response({'status': False, 'message': 'You are not authorized to update this user'})
+        except User.DoesNotExist:
+            return Response({'status': False, 'message': 'No user found'})
+
 
         
 
@@ -87,7 +125,7 @@ class UserPersonalInfoAPI(RetrieveUpdateAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response({'status': True, 'message': 'Personal info detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -114,7 +152,7 @@ class UserAcademicInfoListCreateAPI(ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         queryset = AcademicInfo.objects.all()
         serializer = AcademicInfoDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({'Status': True, 'message': 'Academic info list', 'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
@@ -136,7 +174,7 @@ class UserAcademicInfoAPI(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response({'status': True, 'message': 'Academic info detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -172,7 +210,7 @@ class UserTrainingInfoListCreateAPI(ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         queryset = TrainingInfo.objects.all()
         serializer = TrainingInfoDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({'Status': True, 'message': 'Training info list', 'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
@@ -194,7 +232,7 @@ class UserTrainingInfoAPI(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response({'status': True, 'message': 'Training info detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -230,7 +268,7 @@ class UserTeachingInfoListCreateAPI(ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = TeachingInfoDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({'Status': True, 'message': 'Teaching info list', 'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
@@ -252,7 +290,7 @@ class UserTeachingInfoAPI(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response({'status': True, 'message': 'Teaching info detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -287,7 +325,7 @@ class UserPublicationInfoListCreateAPI(ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = PublicationInfoDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({'Status': True, 'message': 'Publication info list', 'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
@@ -309,7 +347,7 @@ class UserPublicationInfoAPI(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response({'status': True, 'message': 'Publication info detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -345,7 +383,7 @@ class UserAwardAndScholarshipInfoListCreateAPI(ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = AwardAndScholarshipInfoDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({'Status': True, 'message': 'Award and scholarship info list', 'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
@@ -367,7 +405,7 @@ class UserAwardAndScholarshipInfoAPI(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response({'status': True, 'message': 'Award and scholarship info detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -403,7 +441,7 @@ class UserExperienceInfoListCreateAPI(ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = ExperienceInfoDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({'Status': True, 'message': 'Experience info list', 'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
@@ -425,7 +463,7 @@ class UserExperienceInfoAPI(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response({'status': True, 'message': 'Experience info detail', 'data': serializer.data})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
