@@ -30,7 +30,7 @@ class UserListAPI(ListAPIView):
             return Response({'status': False, 'message': 'No user found'})
 
 
-# User Detail API
+# User Detail API View
 # class UserDetailApi(RetrieveUpdateAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = UserDetailSerializer
