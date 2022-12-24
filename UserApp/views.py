@@ -30,7 +30,7 @@ class UserListAPI(ListAPIView):
             return Response({'status': False, 'message': 'No user found'})
 
 
-# User Detail API View
+# User Detail API
 # class UserDetailApi(RetrieveUpdateAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = UserDetailSerializer
@@ -54,21 +54,31 @@ class UserListAPI(ListAPIView):
 #                 return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
 #         else:
 #             return Response({'status': False, 'message': 'You are not authorized to update this user'})
-class UserDetailApi(APIView):
+class UserDetailAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         try:
             user = User.objects.get(id=pk)
             serializer = UsersSerializer(user)
-            personalInfoSerializer = PersonalInfoDetailSerializer(PersonalInfo.objects.get(user=user))
 
             if serializer.data:
-                serializer.data['personal_info'] = personalInfoSerializer.data
-                return Response({'status': True, 'message': 'User detail', 'data': serializer.data})
+                if PersonalInfo.objects.filter(user=user).exists():
+                    personalInfo = PersonalInfo.objects.get(user=user)
+                    return Response({
+                        'status': True, 
+                        'message': 'User detail', 
+                        'data': serializer.data,
+                        'personal_info': PersonalInfoDetailSerializer(personalInfo).data})
+                else:
+                    return Response({
+                        'status': False, 
+                        'message': 'User detail',
+                        'data': serializer.data,
+                        'personal_info': {}})
             else:
                 return Response({'status': False, 'message': 'No user found'})
-        except User.DoesNotExist:
+        except:
             return Response({'status': False, 'message': 'No user found'})
 
     def put(self, request, pk):
@@ -85,10 +95,8 @@ class UserDetailApi(APIView):
                     return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
             else:
                 return Response({'status': False, 'message': 'You are not authorized to update this user'})
-        except User.DoesNotExist:
+        except:
             return Response({'status': False, 'message': 'No user found'})
-
-
         
 
 
@@ -171,31 +179,63 @@ class UserAcademicInfoAPI(RetrieveUpdateDestroyAPIView):
     serializer_class = AcademicInfoDetailSerializer
     permission_classes = [IsAuthenticated]
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response({'status': True, 'message': 'Academic info detail', 'data': serializer.data})
+    # def retrieve(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance)
+    #     return Response({'status': True, 'message': 'Academic info detail', 'data': serializer.data})
+    def retrieve(self, request, pk):
+        try:
+            academicInfo = AcademicInfo.objects.get(id=pk)
+            serializer = AcademicInfoDetailSerializer(academicInfo)
+            return Response({'status': True, 'message': 'Academic info detail', 'data': serializer.data})
+        except:
+            return Response({'status': False, 'message': 'No academic info found'})
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = AcademicInfoSerializer(instance, data=request.data)
+    # def update(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = AcademicInfoSerializer(instance, data=request.data)
 
-        if request.user == instance.user:
-            if serializer.is_valid():
-                serializer.save()
-                return Response({'status': True, 'message': 'Academic info updated successfully', 'data': serializer.data})
+    #     if request.user == instance.user:
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response({'status': True, 'message': 'Academic info updated successfully', 'data': serializer.data})
+    #         else:
+    #             return Response({'status': False, 'message': 'Academic info not updated', 'data': serializer.errors})
+    #     else:
+    #         return Response({'status': False, 'message': 'You are not authorized to update this academic info'})
+    def update(self, request, pk):
+        try:
+            academicInfo = AcademicInfo.objects.get(id=pk)
+            serializer = AcademicInfoSerializer(academicInfo, data=request.data)
+
+            if request.user == academicInfo.user:
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({'status': True, 'message': 'Academic info updated successfully', 'data': serializer.data})
+                else:
+                    return Response({'status': False, 'message': 'Academic info not updated', 'data': serializer.errors})
             else:
-                return Response({'status': False, 'message': 'Academic info not updated', 'data': serializer.errors})
-        else:
-            return Response({'status': False, 'message': 'You are not authorized to update this academic info'})
+                return Response({'status': False, 'message': 'You are not authorized to update this academic info'})
+        except:
+            return Response({'status': False, 'message': 'No academic info found'})
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if request.user == instance.user:
-            instance.delete()
-            return Response({'status': True, 'message': 'Academic info deleted successfully'})
-        else:
-            return Response({'status': False, 'message': 'You are not authorized to delete this academic info'})
+    # def destroy(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     if request.user == instance.user:
+    #         instance.delete()
+    #         return Response({'status': True, 'message': 'Academic info deleted successfully'})
+    #     else:
+    #         return Response({'status': False, 'message': 'You are not authorized to delete this academic info'})
+    def destroy(self, request, pk):
+        try:
+            academicInfo = AcademicInfo.objects.get(id=pk)
+            if request.user == academicInfo.user:
+                academicInfo.delete()
+                return Response({'status': True, 'message': 'Academic info deleted successfully'})
+            else:
+                return Response({'status': False, 'message': 'You are not authorized to delete this academic info'})
+        except:
+            return Response({'status': False, 'message': 'No academic info found'})
 
 
 
