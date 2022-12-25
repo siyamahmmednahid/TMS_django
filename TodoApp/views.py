@@ -38,9 +38,17 @@ class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
     serializer_class = TodoDetailSerializer
     queryset = Todo.objects.all()
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = TodoDetailSerializer(instance)
+    # def retrieve(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = TodoDetailSerializer(instance)
+    #     return Response(serializer.data)
+    def retrieve(self, request, pk):
+        try:
+            todo = Todo.objects.get(pk=pk)
+        except Todo.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = TodoDetailSerializer(todo)
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
