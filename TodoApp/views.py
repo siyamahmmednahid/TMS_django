@@ -25,12 +25,14 @@ class TodoListCreateAPI(ListCreateAPIView):
         serializer = TodoSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         user = request.user
         serializer = TodoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=user)
             return Response({'status': True, 'message': 'Todo created successfully', 'data': serializer.data})
+        else:
+            return Response({'status': False, 'message': 'Todo not created', 'data': serializer.errors})
 
 
 class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
@@ -44,12 +46,11 @@ class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
     #     return Response(serializer.data)
     def retrieve(self, request, pk):
         try:
-            todo = Todo.objects.get(pk=pk)
+            todo = Todo.objects.get(id=pk)
+            serializer = TodoDetailSerializer(todo)
+            return Response({'status': True, 'message': 'Todo Detail', 'data': serializer.data})
         except Todo.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = TodoDetailSerializer(todo)
-        return Response(serializer.data)
+            return Response({'status': False, 'message': 'Todo does not exist'})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
