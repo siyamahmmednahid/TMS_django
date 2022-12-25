@@ -25,39 +25,27 @@ class UserListAPI(ListAPIView):
                 for personalInfo in personalInfoSerializer.data:
                     if data['id'] == personalInfo['user']:
                         data['personal_info'] = personalInfo
-            return Response({'status': True, 'message': 'Users list', 'data': serializer.data})
+            return Response({
+                'status': True, 
+                'message': 'Users list', 
+                'data': serializer.data})
         else:
-            return Response({'status': False, 'message': 'No user found'})
+            return Response({
+                'status': False, 
+                'message': 'No user found'})
 
 
 # User Detail API
-# class UserDetailApi(RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserDetailSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def retrieve(self, request, *args, **kwargs):
-#         instance = self.get_object()
-#         serializer = UsersSerializer(instance)
-#         return Response({'status': True, 'message': 'User detail', 'data': serializer.data})
-
-#     def update(self, request, *args, **kwargs):
-#         instance = self.get_object()
-#         serializer = UserDetailSerializer(instance, data=request.data)
-#         returnSerializer = UsersSerializer(instance)
-        
-#         if request.user == instance:
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return Response({'status': True, 'message': 'User updated successfully', 'data': returnSerializer.data})
-#             else:
-#                 return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
-#         else:
-#             return Response({'status': False, 'message': 'You are not authorized to update this user'})
-class UserDetailAPI(APIView):
+class UserDetailAPI(RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserDetailSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk):
+    # def retrieve(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = UsersSerializer(instance)
+    #     return Response({'status': True, 'message': 'User detail', 'data': serializer.data})
+    def retrieve(self, request, pk):
         try:
             user = User.objects.get(id=pk)
             serializer = UsersSerializer(user)
@@ -81,7 +69,20 @@ class UserDetailAPI(APIView):
         except:
             return Response({'status': False, 'message': 'No user found'})
 
-    def put(self, request, pk):
+    # def update(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = UserDetailSerializer(instance, data=request.data)
+    #     returnSerializer = UsersSerializer(instance)
+        
+    #     if request.user == instance:
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response({'status': True, 'message': 'User updated successfully', 'data': returnSerializer.data})
+    #         else:
+    #             return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
+    #     else:
+    #         return Response({'status': False, 'message': 'You are not authorized to update this user'})
+    def update(self, request, pk):
         try:
             user = User.objects.get(id=pk)
             serializer = UserDetailSerializer(user, data=request.data)
@@ -97,6 +98,51 @@ class UserDetailAPI(APIView):
                 return Response({'status': False, 'message': 'You are not authorized to update this user'})
         except:
             return Response({'status': False, 'message': 'No user found'})
+
+
+# class UserDetailAPI(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, pk):
+#         try:
+#             user = User.objects.get(id=pk)
+#             serializer = UsersSerializer(user)
+
+#             if serializer.data:
+#                 if PersonalInfo.objects.filter(user=user).exists():
+#                     personalInfo = PersonalInfo.objects.get(user=user)
+#                     return Response({
+#                         'status': True, 
+#                         'message': 'User detail', 
+#                         'data': serializer.data,
+#                         'personal_info': PersonalInfoDetailSerializer(personalInfo).data})
+#                 else:
+#                     return Response({
+#                         'status': False, 
+#                         'message': 'User detail',
+#                         'data': serializer.data,
+#                         'personal_info': {}})
+#             else:
+#                 return Response({'status': False, 'message': 'No user found'})
+#         except:
+#             return Response({'status': False, 'message': 'No user found'})
+
+#     def put(self, request, pk):
+#         try:
+#             user = User.objects.get(id=pk)
+#             serializer = UserDetailSerializer(user, data=request.data)
+#             returnSerializer = UsersSerializer(user)
+
+#             if request.user == user:
+#                 if serializer.is_valid():
+#                     serializer.save()
+#                     return Response({'status': True, 'message': 'User updated successfully', 'data': returnSerializer.data})
+#                 else:
+#                     return Response({'status': False, 'message': 'User not updated', 'data': serializer.errors})
+#             else:
+#                 return Response({'status': False, 'message': 'You are not authorized to update this user'})
+#         except:
+#             return Response({'status': False, 'message': 'No user found'})
         
 
 

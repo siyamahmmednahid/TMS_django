@@ -86,8 +86,8 @@ class TrainingInfo(models.Model):
 # For teaching info model
 class TeachingInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    CourseCode = models.CharField(max_length=10, blank=True)
-    CourseTitle = models.CharField(max_length=50, blank=True)
+    CourseCode = models.CharField(max_length=10)
+    CourseTitle = models.CharField(max_length=50)
     Credit = models.CharField(max_length=2, blank=True)
     Semester = models.CharField(max_length=10, blank=True)
 
