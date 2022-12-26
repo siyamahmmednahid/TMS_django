@@ -16,6 +16,8 @@ class Todo(models.Model):
     Priority = models.CharField(max_length=10, choices=Priority_Choices, default='Low')
     Completed = models.BooleanField(default=False)
     Description = models.TextField(blank=True)
+    Comment = models.TextField(blank=True)
+    TaskCompleted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.Title + ' - ' + self.user.username

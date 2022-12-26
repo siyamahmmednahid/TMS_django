@@ -10,34 +10,32 @@ from django.contrib.auth.models import User
 
 class TodoListCreateAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = TodoSerializer
     queryset = Todo.objects.all()
 
-    def get_queryset(self):
-        user = self.request.user
-        return Todo.objects.filter(user=user)
-
     def list(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            queryset = Todo.objects.all()
-        else:
-            queryset = Todo.objects.filter(Assignee=request.user)
-        serializer = TodoDetailSerializer(queryset, many=True)
-        return Response({
-            'status': True, 
-            'message': 'Todo List', 
-            'data': serializer.data})
+        serializer = TodoDetailSerializer(self.get_queryset(), many=True)
 
-    def create(self, request):
-        user = request.user
-        serializer = TodoSerializer(data=request.data)
-        responseSerializer = TodoDetailSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=user)
+        if request.user.is_superuser:
             return Response({
                 'status': True, 
-                'message': 'Todo created successfully',
-                'data': responseSerializer.data})
+                'message': 'Todo list', 
+                'data': serializer.data})
+        else:
+            serializer = TodoDetailSerializer(self.get_queryset().filter(Assignee=request.user), many=True)
+            return Response({
+                'status': True, 
+                'message': 'Todo list', 
+                'data': serializer.data})
+
+    def create(self, request, *args, **kwargs):
+        serializer = TodoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            serializer = TodoDetailSerializer(serializer.instance)
+            return Response({
+                'status': True, 
+                'message': 'Todo created successfully', 
+                'data': serializer.data})
         else:
             return Response({
                 'status': False, 
@@ -45,39 +43,28 @@ class TodoListCreateAPI(ListCreateAPIView):
                 'data': serializer.errors})
 
 
+
 class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = TodoDetailSerializer
     queryset = Todo.objects.all()
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     serializer = TodoDetailSerializer(instance)
-    #     return Response(serializer.data)
     def retrieve(self, request, pk):
         try:
-            todo = Todo.objects.get(id=pk)
-            serializer = TodoDetailSerializer(todo)
-            return Response({'status': True, 'message': 'Todo Detail', 'data': serializer.data})
-        except Todo.DoesNotExist:
-            return Response({'status': False, 'message': 'Todo does not exist'})
+            todo = Todo.objects.get(pk=pk)
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if request.user.is_superuser:
-            serializer = TodoSerializer(instance, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({'status': True, 'message': 'Todo updated successfully', 'data': serializer.data})
+            if request.user.is_superuser or request.user == todo.Assignee:
+                serializer = TodoDetailSerializer(todo)
+                return Response({
+                    'status': True, 
+                    'message': 'Todo detail', 
+                    'data': serializer.data})
             else:
-                return Response({'status': False, 'message': 'Todo not updated', 'data': serializer.errors})
-        else:
-            serializer = TodoAssigneeSerializer(instance, data=request.data)
-            if Todo.objects.filter(Completed=True).exists():
-                return Response({'status': False, 'message': 'Todo is completed'})
-            else:
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response({'status': True, 'message': 'Todo updated successfully', 'data': serializer.data})
-                else:
-                    return Response({'status': False, 'message': 'Todo not updated', 'data': serializer.errors})
+                return Response({
+                    'status': False, 
+                    'message': 'You are not authorized to view this todo', 
+                    'data': []})
+        except Todo.DoesNotExist:
+            return Response({
+                'status': False, 
+                'message': 'Todo not found', 
+                'data': []})
