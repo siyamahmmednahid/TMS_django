@@ -4,12 +4,12 @@ from .models import *
 
 
 
-# For todo list serializer
+# For todo create serializer
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
         field = '__all__'
-        exclude = ['user', 'Comment', 'TaskCompleted']
+        exclude = ['user']
 
 
 # For todo detail serializer
@@ -17,3 +17,10 @@ class TodoDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
         fields = '__all__'
+
+
+# For todo assignee serializer
+class TodoAssigneeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = ['Description', 'Completed']

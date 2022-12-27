@@ -71,8 +71,22 @@ class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
         try:
             todo = Todo.objects.get(pk=pk)
 
-            if request.user.is_superuser or request.user == todo.Assignee:
+            if request.user.is_superuser or request.user == todo.user:
                 serializer = TodoSerializer(todo, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    serializer = TodoDetailSerializer(serializer.instance)
+                    return Response({
+                        'status': True, 
+                        'message': 'Todo updated successfully', 
+                        'data': serializer.data})
+                else:
+                    return Response({
+                        'status': False, 
+                        'message': 'Todo not updated', 
+                        'data': serializer.errors})
+            elif request.user == todo.Assignee:
+                serializer = TodoAssigneeSerializer(todo, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
                     serializer = TodoDetailSerializer(serializer.instance)
@@ -89,6 +103,7 @@ class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
                 return Response({
                     'status': False, 
                     'message': 'You are not authorized to update this todo'})
+
         except Todo.DoesNotExist:
             return Response({
                 'status': False, 
