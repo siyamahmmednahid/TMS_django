@@ -4,52 +4,101 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from .serializers import *
 from .models import *
 from django.contrib.auth.models import User
+import json
 
 
 
 # For event list and create API
 class EventListCreateAPIView(ListCreateAPIView):
-    serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Event.objects.filter(user=self.request.user)
-
+    
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = EventDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        serializer = EventDetailSerializer(Event.objects.all(), many=True)
+        return Response({
+            'status': True, 
+            'message': 'Event list', 
+            'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
         serializer = EventSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=self.request.user)
-            return Response(serializer.data)
-        return Response(serializer.errors)
+            serializer.save(user=request.user)
+            serializer = EventDetailSerializer(serializer.instance)
+            return Response({
+                'status': True, 
+                'message': 'Event created successfully', 
+                'data': serializer.data})
+        else:
+            return Response({
+                'status': False, 
+                'message': 'Event not created', 
+                'data': serializer.errors})
+
+
+
 
 
 # For event detail, update and delete API
 class EventDetailAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = EventDetailSerializer
 
-    def get_queryset(self):
-        return Event.objects.filter(user=self.request.user)
+    def retrieve(self, request, pk):
+        try:
+            event = Event.objects.get(pk=pk)
+            serializer = EventDetailSerializer(event)
+            if request.user.is_superuser or request.user == event.user or request.user in event.Guests.all():
+                return Response({
+                    'status': True, 
+                    'message': 'Event detail', 
+                    'data': serializer.data})
+            else:
+                return Response({
+                    'status': False, 
+                    'message': 'You are not authorized to view this event'})
+        except:
+            return Response({
+                'status': False, 
+                'message': 'Event not found'})
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = EventDetailSerializer(instance)
-        return Response(serializer.data)
+    def update(self, request, pk):
+        try:
+            event = Event.objects.get(pk=pk)
+            if request.user.is_superuser or request.user == event.user:
+                serializer = EventSerializer(event, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    serializer = EventDetailSerializer(serializer.instance)
+                    return Response({
+                        'status': True, 
+                        'message': 'Event updated successfully', 
+                        'data': serializer.data})
+                else:
+                    return Response({
+                        'status': False, 
+                        'message': 'Event not updated', 
+                        'data': serializer.errors})
+            else:
+                return Response({
+                    'status': False, 
+                    'message': 'You are not authorized to update this event'})
+        except:
+            return Response({
+                'status': False, 
+                'message': 'Event not found'})
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = EventSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': 'Event updated successfully', 'data': serializer.data})
-        return Response({'message': 'Event update failed', 'data': serializer.errors})
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.delete()
-        return Response({'message': 'Event deleted successfully'})
+    def destroy(self, request, pk):
+        try:
+            event = Event.objects.get(pk=pk)
+            if request.user.is_superuser or request.user == event.user:
+                event.delete()
+                return Response({
+                    'status': True, 
+                    'message': 'Event deleted successfully'})
+            else:
+                return Response({
+                    'status': False, 
+                    'message': 'You are not authorized to delete this event'})
+        except:
+            return Response({
+                'status': False, 
+                'message': 'Event not found'})
