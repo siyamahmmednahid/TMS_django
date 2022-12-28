@@ -13,19 +13,24 @@ class TodoListCreateAPI(ListCreateAPIView):
     queryset = Todo.objects.all()
 
     def list(self, request, *args, **kwargs):
+        user = request.user
         serializer = TodoDetailSerializer(self.get_queryset(), many=True)
 
-        if request.user.is_superuser:
+        if user.is_superuser:
             return Response({
                 'status': True, 
                 'message': 'Todo list', 
                 'data': serializer.data})
         else:
-            serializer = TodoDetailSerializer(self.get_queryset().filter(Assignee=request.user), many=True)
+            todos = []
+            for todo in serializer.data:
+                if todo['user'] == user.id or todo['Assignee'] == user.id:
+                    todos.append(todo)
             return Response({
                 'status': True, 
                 'message': 'Todo list', 
-                'data': serializer.data})
+                'data': todos})
+
 
     def create(self, request, *args, **kwargs):
         serializer = TodoSerializer(data=request.data)

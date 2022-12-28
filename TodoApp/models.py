@@ -14,6 +14,7 @@ class Todo(models.Model):
         ('Urgent', 'Urgent'),
     )
     Priority = models.CharField(max_length=10, choices=Priority_Choices, default='Low')
+    Important = models.BooleanField(default=False)
     Completed = models.BooleanField(default=False)
     Description = models.TextField(blank=True)
     Comment = models.TextField(blank=True)
