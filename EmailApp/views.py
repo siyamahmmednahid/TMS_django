@@ -9,24 +9,27 @@ from django.contrib.auth.models import User
 # For email list and create API
 class EmailListCreateAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Email.objects.all()
-    serializer_class = EmailSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return Email.objects.filter(user=user)
-
+    
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = Email.objects.all()
         serializer = EmailDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({
+            'status': True, 
+            'message': 'Email list', 
+            'data': serializer.data})
 
     def create(self, request, *args, **kwargs):
-        user = User.objects.get(username=request.user)
         serializer = EmailSerializer(data=request.data)
-
         if serializer.is_valid():
-            serializer.save(user=user)
-            return Response({'message': 'Email created successfully', 'data': serializer.data})
+            serializer.save(Sender=request.user)
+            serializer = EmailDetailSerializer(serializer.instance)
+            return Response({
+                'status': True, 
+                'message': 'Email created successfully', 
+                'data': serializer.data})
         else:
-            return Response({'message': 'Something went wrong', 'data': serializer.errors})
+            return Response({
+                'status': False, 
+                'message': 'Email not created', 
+                'data': serializer.errors})
+            

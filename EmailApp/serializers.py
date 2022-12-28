@@ -1,14 +1,22 @@
 from rest_framework import serializers
 from .models import *
 
+# For email list and create API
 class EmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = '__all__'
+        fields = ['Receiver', 'CarbonCopy', 'BlindCarbonCopy', 'Subject', 'Body']
 
 
+# For email detail and delete API
 class EmailDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
         fields = '__all__'
-        exclude = ['Sender']
+
+
+# For email update API
+class EmailUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['Label', 'Draft', 'Important', 'Read', 'Deleted']
