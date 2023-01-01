@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 class Email(models.Model):
     Sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
     Receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
-    CarbonCopy = models.ManyToManyField(User, related_name='carboncopy')
-    BlindCarbonCopy = models.ManyToManyField(User, related_name='blindcarboncopy')
+    CarbonCopy = models.ManyToManyField(User, related_name='carboncopy', blank=True)
+    BlindCarbonCopy = models.ManyToManyField(User, related_name='blindcarboncopy', blank=True)
     Subject = models.CharField(max_length=100)
     Body = models.TextField()
     Date = models.DateTimeField(auto_now_add=True)

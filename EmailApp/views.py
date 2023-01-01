@@ -38,3 +38,68 @@ class EmailListCreateAPIView(ListCreateAPIView):
 
 
 # For email detail, update and delete API
+class EmailDetailUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, pk):
+        try:
+            email = Email.objects.get(pk=pk)
+            serializer = EmailDetailSerializer(email)
+            return Response({
+                'status': True, 
+                'message': 'Email detail', 
+                'data': serializer.data})
+        except Email.DoesNotExist:
+            return Response({
+                'status': False, 
+                'message': 'Email not found'})
+
+    def update(self, request, pk):
+        try:
+            email = Email.objects.get(pk=pk)
+
+            if request.user == email.Sender or request.user == email.Receiver:
+                serializer = EmailSerializer(email, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    serializer = EmailDetailSerializer(serializer.instance)
+                    return Response({
+                        'status': True, 
+                        'message': 'Email updated successfully', 
+                        'data': serializer.data})
+                else:
+                    return Response({
+                        'status': False, 
+                        'message': 'Email not updated', 
+                        'data': serializer.errors})
+            else:
+                return Response({
+                    'status': False, 
+                    'message': 'You are not allowed to update this email'})
+        except Email.DoesNotExist:
+            return Response({
+                'status': False, 
+                'message': 'Email not found'})
+
+    def destroy(self, request, pk):
+        try:
+            email = Email.objects.get(pk=pk)
+
+            if request.user == email.Sender or request.user == email.Receiver:
+                if email.Deleted == True:
+                    email.delete()
+                    return Response({
+                        'status': True, 
+                        'message': 'Email deleted successfully'})
+                else:
+                    return Response({
+                        'status': False,
+                        'message': 'Email not deleted. You can only delete email from trash'})
+            else:
+                return Response({
+                    'status': False, 
+                    'message': 'You are not allowed to delete this email'})
+        except Email.DoesNotExist:
+            return Response({
+                'status': False, 
+                'message': 'Email not found'})
