@@ -33,3 +33,8 @@ class EmailListCreateAPIView(ListCreateAPIView):
                 'message': 'Email not created', 
                 'data': serializer.errors})
             
+
+
+
+
+# For email detail, update and delete API
