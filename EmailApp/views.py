@@ -59,7 +59,7 @@ class EmailDetailUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
             email = Email.objects.get(pk=pk)
 
             if request.user == email.Sender or request.user == email.Receiver:
-                serializer = EmailSerializer(email, data=request.data)
+                serializer = EmailUpdateSerializer(email, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
                     serializer = EmailDetailSerializer(serializer.instance)
