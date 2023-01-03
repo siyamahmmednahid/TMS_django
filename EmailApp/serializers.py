@@ -20,3 +20,10 @@ class EmailUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
         fields = ['Label', 'Draft', 'Important', 'Read', 'Deleted']
+
+
+# For email delete API
+class EmailDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['Sender', 'Receiver', 'CarbonCopy', 'BlindCarbonCopy']
