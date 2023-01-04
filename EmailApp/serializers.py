@@ -3,28 +3,63 @@ from .models import *
 
 
 
-# For email list and create API
-class EmailSerializer(serializers.ModelSerializer):
+# For sender
+class SenderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
         fields = ['Receiver', 'CarbonCopy', 'BlindCarbonCopy', 'Subject', 'Body']
 
 
 
-
-
-# For email detail and delete API
-class EmailDetailSerializer(serializers.ModelSerializer):
+class SenderDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = '__all__'
+        fields = ['id', 'Receiver', 'CarbonCopy', 'BlindCarbonCopy', 'Subject', 'Body', 'Date', 'SenderLabel', 'SenderDraft', 'SenderImportant', 'SenderTrash', 'SenderDelete']
 
 
 
 
 
-# For email update API
-class EmailUpdateSerializer(serializers.ModelSerializer):
+# For receiver
+class ReceiverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['Label', 'Draft', 'Important', 'Read', 'Deleted']
+        fields = ['Sender', 'CarbonCopy', 'BlindCarbonCopy', 'Subject', 'Body']
+
+
+class ReceiverDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['Sender', 'CarbonCopy', 'BlindCarbonCopy', 'Subject', 'Body', 'Date', 'ReceiverLabel', 'ReceiverDraft', 'ReceiverImportant', 'ReceiverTrash', 'ReceiverDelete']
+
+
+
+
+
+# For carbon copy
+class CarbonCopySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['Sender', 'Receiver', 'BlindCarbonCopy', 'Subject', 'Body']
+
+
+class CarbonCopyDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['Sender', 'Receiver', 'BlindCarbonCopy', 'Subject', 'Body', 'Date', 'CarbonCopyLabel', 'CarbonCopyDraft', 'CarbonCopyImportant', 'CarbonCopyTrash', 'CarbonCopyDelete']
+
+
+
+
+
+# For blind carbon copy
+class BlindCarbonCopySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['Sender', 'Receiver', 'CarbonCopy', 'Subject', 'Body']
+
+
+class BlindCarbonCopyDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['Sender', 'Receiver', 'CarbonCopy', 'Subject', 'Body', 'Date', 'BlindCarbonCopyLabel', 'BlindCarbonCopyDraft', 'BlindCarbonCopyImportant', 'BlindCarbonCopyTrash', 'BlindCarbonCopyDelete']
