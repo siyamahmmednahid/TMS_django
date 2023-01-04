@@ -11,7 +11,7 @@ class EmailListCreateAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     
     def list(self, request, *args, **kwargs):
-        queryset = Email.objects.all()
+        queryset = Email.objects.all().filter(Receiver=request.user, Deleted=False)
         serializer = EmailDetailSerializer(queryset, many=True)
         return Response({
             'status': True, 
@@ -82,7 +82,28 @@ class EmailDetailUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
                 'message': 'Email not found'})
 
     def destroy(self, request, pk):
-        pass
+        try:
+            email = Email.objects.get(pk=pk)
+
+            if request.user == email.Receiver:
+                if email.Deleted == True:
+                    email.Receiver = None
+                    email.save()
+                    return Response({
+                        'status': True,
+                        'message': 'Email deleted successfully'})
+                else:
+                    return Response({
+                        'status': False,
+                        'message': 'Email not deleted. You can only delete email from trash'})
+            else:
+                return Response({
+                    'status': False, 
+                    'message': 'You are not allowed to delete this email'})
+        except Email.DoesNotExist:
+            return Response({
+                'status': False, 
+                'message': 'Email not found'})
 
 
 
