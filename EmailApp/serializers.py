@@ -30,7 +30,7 @@ class ReceiverSerializer(serializers.ModelSerializer):
 class ReceiverDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['Sender', 'CarbonCopy', 'BlindCarbonCopy', 'Subject', 'Body', 'Date', 'ReceiverLabel', 'ReceiverDraft', 'ReceiverImportant', 'ReceiverTrash', 'ReceiverDelete']
+        fields = ['Subject', 'Body', 'Date', 'Sender', 'CarbonCopy', 'ReceiverLabel', 'ReceiverDraft', 'ReceiverImportant', 'ReceiverTrash', 'ReceiverDelete']
 
 
 
@@ -46,7 +46,7 @@ class CarbonCopySerializer(serializers.ModelSerializer):
 class CarbonCopyDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['Sender', 'Receiver', 'BlindCarbonCopy', 'Subject', 'Body', 'Date', 'CarbonCopyLabel', 'CarbonCopyDraft', 'CarbonCopyImportant', 'CarbonCopyTrash', 'CarbonCopyDelete']
+        fields = ['Subject', 'Body', 'Date', 'Sender', 'Receiver', 'CarbonCopyLabel', 'CarbonCopyDraft', 'CarbonCopyImportant', 'CarbonCopyTrash', 'CarbonCopyDelete']
 
 
 
@@ -62,4 +62,4 @@ class BlindCarbonCopySerializer(serializers.ModelSerializer):
 class BlindCarbonCopyDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['Sender', 'Receiver', 'CarbonCopy', 'Subject', 'Body', 'Date', 'BlindCarbonCopyLabel', 'BlindCarbonCopyDraft', 'BlindCarbonCopyImportant', 'BlindCarbonCopyTrash', 'BlindCarbonCopyDelete']
+        fields = ['Subject', 'Body', 'Date', 'Sender', 'Receiver', 'CarbonCopy', 'BlindCarbonCopyLabel', 'BlindCarbonCopyDraft', 'BlindCarbonCopyImportant', 'BlindCarbonCopyTrash', 'BlindCarbonCopyDelete']
