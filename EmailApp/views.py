@@ -1,14 +1,30 @@
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .serializers import *
 from .models import *
 from django.contrib.auth.models import User
 
 
 
-# For email list and create API
-class EmailListCreateAPIView(ListCreateAPIView):
+# For email list API
+class EmailListAPIView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        queryset = Email.objects.all().filter(Receiver=request.user).order_by('-Date') or Email.objects.all().filter(CarbonCopy=request.user).order_by('-Date') or Email.objects.all().filter(BlindCarbonCopy=request.user).order_by('-Date')
+        serializer = ReceiverDetailSerializer(queryset, many=True)
+        return Response({
+            'status': True,
+            'message': 'Email list',
+            'data': serializer.data})
+
+
+
+
+
+# For send email list and create API
+class SentEmailListCreateAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     
     def list(self, request, *args, **kwargs):
