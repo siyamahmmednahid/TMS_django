@@ -11,6 +11,7 @@ class Email(models.Model):
     Body = models.TextField()
     Date = models.DateTimeField(auto_now_add=True)
     Updated = models.DateTimeField(auto_now=True)
+    Draft = models.BooleanField(default=False)
     Label_Choices = (
         ('None', 'None'),
         ('Personal', 'Personal'),
@@ -22,8 +23,6 @@ class Email(models.Model):
     ReceiverLabel = models.CharField(max_length=10, choices=Label_Choices, default='None')
     CcLabel = models.CharField(max_length=10, choices=Label_Choices, default='None')
     BccLabel = models.CharField(max_length=10, choices=Label_Choices, default='None')
-
-    Draft = models.BooleanField(default=False)
 
     SenderImportant = models.BooleanField(default=False)
     ReceiverImportant = models.BooleanField(default=False)

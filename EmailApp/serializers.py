@@ -4,27 +4,34 @@ from .models import *
 
 
 # For sender 
-class SenderSerializer(serializers.ModelSerializer):
+class SentEmailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['Receiver', 'Cc', 'Bcc', 'Subject', 'Body']
+        model = Email
+        fields = ['Receiver', 'Cc', 'Bcc', 'Subject', 'Body', 'Draft']
 
 
-class SenderDetailSerializer(serializers.ModelSerializer):
+class SentEmailUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'Receiver', 'Cc', 'Bcc', 'Subject', 'Body']
+        model = Email
+        fields = ['SenderLabel', 'SenderImportant', 'SenderTrash', 'SenderDelete']
+
+
+class SentEmailDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ['id', 'Receiver', 'Cc', 'Bcc', 'Subject', 'Body', 'Date', 'Draft', 'SenderLabel', 'SenderImportant', 'SenderTrash', 'SenderDelete']
+
 
 
 
 # For receiver
 class ReceiverSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Email
         fields = ['Sender', 'Cc', 'Bcc', 'Subject', 'Body']
 
 
 class ReceiverDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Email
         fields = ['id', 'Sender', 'Cc', 'Bcc', 'Subject', 'Body']
