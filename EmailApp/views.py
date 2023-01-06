@@ -7,12 +7,75 @@ from django.contrib.auth.models import User
 
 
 
-# For email list API
+# For email list and email update API
 class EmailListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        pass
+        user = request.user
+        queryset = Email.objects.filter(Receiver=user, ReceiverDelete=False)
+        CcQueryset = Email.objects.filter(Cc=user, CcDelete=False)
+        BccQueryset = Email.objects.filter(Bcc=user, BccDelete=False)
+        serializer = ReceiverSerializer(queryset, many=True)
+        CcSerializer = ReceiverSerializer(CcQueryset, many=True)
+        BccSerializer = ReceiverSerializer(BccQueryset, many=True)
+        return Response({
+            'status': True,
+            'message': 'Email list',
+            'Receiver': serializer.data,
+            'Cc': CcSerializer.data,
+            'Bcc': BccSerializer.data})
+
+
+
+class EmailDetailAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, pk):
+        try:
+            user = request.user
+            email = Email.objects.get(id=pk)
+            serializer = ReceiverDetailSerializer(email)
+            CcSerializer = CcDetailSerializer(email)
+            BccSerializer = BccDetailSerializer(email)
+            if email.Receiver == user:
+                if email.ReceiverDelete == True:
+                    return Response({
+                        'status': False,
+                        'message': 'Email deleted'})
+                else:
+                    return Response({
+                        'status': True,
+                        'message': 'Email detail',
+                        'data': serializer.data})
+            elif email.Cc == user:
+                if email.CcDelete == True:
+                    return Response({
+                        'status': False,
+                        'message': 'Email deleted'})
+                else:
+                    return Response({
+                        'status': True,
+                        'message': 'Email detail',
+                        'data': CcSerializer.data})
+            elif email.Bcc == user:
+                if email.BccDelete == True:
+                    return Response({
+                        'status': False,
+                        'message': 'Email deleted'})
+                else:
+                    return Response({
+                        'status': True,
+                        'message': 'Email detail',
+                        'data': BccSerializer.data})
+            else:
+                return Response({
+                    'status': False,
+                    'message': 'You are not the receiver of this email'})
+        except:
+            return Response({
+                'status': False,
+                'message': 'Email not found'})
 
 
 
@@ -105,11 +168,11 @@ class SentEmailDetailAPIView(RetrieveUpdateDestroyAPIView):
                 email.save()
                 return Response({
                     'status': True,
-                    'message': 'Email deleted successfully',})
+                    'message': 'Email deleted successfully'})
             else:
                 return Response({
                     'status': False,
-                    'message': 'Email are not in trash',})
+                    'message': 'Email are not in trash'})
         else:
             return Response({
                 'status': False,
