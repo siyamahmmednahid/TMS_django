@@ -34,44 +34,122 @@ class EmailDetailAPIView(RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, pk):
         try:
             user = request.user
-            email = Email.objects.get(id=pk)
-            serializer = ReceiverDetailSerializer(email)
-            CcSerializer = CcDetailSerializer(email)
-            BccSerializer = BccDetailSerializer(email)
-            if email.Receiver == user:
-                if email.ReceiverDelete == True:
-                    return Response({
-                        'status': False,
-                        'message': 'Email deleted'})
-                else:
-                    return Response({
-                        'status': True,
-                        'message': 'Email detail',
-                        'data': serializer.data})
-            elif email.Cc == user:
-                if email.CcDelete == True:
-                    return Response({
-                        'status': False,
-                        'message': 'Email deleted'})
-                else:
-                    return Response({
-                        'status': True,
-                        'message': 'Email detail',
-                        'data': CcSerializer.data})
-            elif email.Bcc == user:
-                if email.BccDelete == True:
-                    return Response({
-                        'status': False,
-                        'message': 'Email deleted'})
-                else:
-                    return Response({
-                        'status': True,
-                        'message': 'Email detail',
-                        'data': BccSerializer.data})
+            if Email.objects.filter(id=pk, Receiver=user).exists():
+                queryset = Email.objects.get(id=pk, Receiver=user)
+                serializer = ReceiverDetailSerializer(queryset)
+                return Response({
+                    'status': True,
+                    'message': 'Receiver email detail',
+                    'data': serializer.data})
+            elif Email.objects.filter(id=pk, Cc=user).exists():
+                queryset = Email.objects.get(id=pk, Cc=user)
+                serializer = ReceiverDetailSerializer(queryset)
+                return Response({
+                    'status': True,
+                    'message': 'Cc email detail',
+                    'data': serializer.data})
+            elif Email.objects.filter(id=pk, Bcc=user).exists():
+                queryset = Email.objects.get(id=pk, Bcc=user)
+                serializer = ReceiverDetailSerializer(queryset)
+                return Response({
+                    'status': True,
+                    'message': 'Bcc email detail',
+                    'data': serializer.data})
             else:
                 return Response({
                     'status': False,
-                    'message': 'You are not the receiver of this email'})
+                    'message': 'Email not found'})
+        except:
+            return Response({
+                'status': False,
+                'message': 'Email not found'})
+
+    def update(self, request, pk):
+        try:
+            user = request.user
+            data = request.data
+            if Email.objects.filter(id=pk, Receiver=user).exists():
+                queryset = Email.objects.get(id=pk, Receiver=user)
+                serializer = ReceiverUpdateSerializer(queryset, data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                    serializer = ReceiverDetailSerializer(serializer.instance)
+                    return Response({
+                        'status': True,
+                        'message': 'Email updated successfully',
+                        'data': serializer.data})
+                else:
+                    return Response({
+                        'status': False,
+                        'message': 'Email not updated',
+                        'data': serializer.errors})
+            elif Email.objects.filter(id=pk, Cc=user).exists():
+                queryset = Email.objects.get(id=pk, Cc=user)
+                serializer = ReceiverUpdateSerializer(queryset, data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                    serializer = ReceiverDetailSerializer(serializer.instance)
+                    return Response({
+                        'status': True,
+                        'message': 'Email updated successfully',
+                        'data': serializer.data})
+                else:
+                    return Response({
+                        'status': False,
+                        'message': 'Email not updated',
+                        'data': serializer.errors})
+            elif Email.objects.filter(id=pk, Bcc=user).exists():
+                queryset = Email.objects.get(id=pk, Bcc=user)
+                serializer = ReceiverUpdateSerializer(queryset, data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                    serializer = ReceiverDetailSerializer(serializer.instance)
+                    return Response({
+                        'status': True,
+                        'message': 'Email updated successfully',
+                        'data': serializer.data})
+                else:
+                    return Response({
+                        'status': False,
+                        'message': 'Email not updated',
+                        'data': serializer.errors})
+            else:
+                return Response({
+                    'status': False,
+                    'message': 'Email not found'})
+        except:
+            return Response({
+                'status': False,
+                'message': 'Email not found'})
+
+    def destroy(self, request, pk):
+        try:
+            user = request.user
+            if Email.objects.filter(id=pk, Receiver=user).exists():
+                queryset = Email.objects.get(id=pk, Receiver=user)
+                queryset.ReceiverDelete = True
+                queryset.save()
+                return Response({
+                    'status': True,
+                    'message': 'Email deleted successfully'})
+            elif Email.objects.filter(id=pk, Cc=user).exists():
+                queryset = Email.objects.get(id=pk, Cc=user)
+                queryset.CcDelete = True
+                queryset.save()
+                return Response({
+                    'status': True,
+                    'message': 'Email deleted successfully'})
+            elif Email.objects.filter(id=pk, Bcc=user).exists():
+                queryset = Email.objects.get(id=pk, Bcc=user)
+                queryset.BccDelete = True
+                queryset.save()
+                return Response({
+                    'status': True,
+                    'message': 'Email deleted successfully'})
+            else:
+                return Response({
+                    'status': False,
+                    'message': 'Email not found'})
         except:
             return Response({
                 'status': False,
