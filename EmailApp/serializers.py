@@ -13,7 +13,7 @@ class SentEmailSerializer(serializers.ModelSerializer):
 class SentEmailUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['SenderLabel', 'SenderImportant', 'SenderTrash', 'SenderDelete']
+        fields = ['SenderLabel', 'SenderImportant', 'SenderTrash']
 
 
 class SentEmailDetailSerializer(serializers.ModelSerializer):
@@ -28,19 +28,13 @@ class SentEmailDetailSerializer(serializers.ModelSerializer):
 class ReceiverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['id', 'Sender', 'Cc', 'Subject', 'Body', 'Date']
+        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'ReceiverLabel', 'ReceiverImportant', 'ReceiverTrash', 'ReceiverDelete']
 
 
 class ReceiverUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['ReceiverLabel', 'ReceiverImportant', 'ReceiverTrash', 'ReceiverDelete']
-
-
-class ReceiverDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Email
-        fields = ['id', 'Sender', 'Cc', 'Subject', 'Body', 'Date', 'ReceiverLabel', 'ReceiverImportant', 'ReceiverTrash', 'ReceiverDelete']
+        fields = ['ReceiverLabel', 'ReceiverImportant', 'ReceiverTrash']
 
 
 
@@ -50,19 +44,13 @@ class ReceiverDetailSerializer(serializers.ModelSerializer):
 class CcSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['id', 'Sender', 'Receiver', 'Subject', 'Body', 'Date']
+        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'CcLabel', 'CcImportant', 'CcTrash', 'CcDelete']
 
 
 class CcUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['CcLabel', 'CcImportant', 'CcTrash', 'CcDelete']
-
-
-class CcDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Email
-        fields = ['id', 'Sender', 'Receiver', 'Subject', 'Body', 'Date', 'CcLabel', 'CcImportant', 'CcTrash', 'CcDelete']
+        fields = ['CcLabel', 'CcImportant', 'CcTrash']
 
 
 
@@ -72,16 +60,10 @@ class CcDetailSerializer(serializers.ModelSerializer):
 class BccSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['id', 'Sender', 'Receiver', 'Subject', 'Body', 'Date']
+        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'BccLabel', 'BccImportant', 'BccTrash', 'BccDelete']
 
 
 class BccUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['BccLabel', 'BccImportant', 'BccTrash', 'BccDelete']
-
-
-class BccDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Email
-        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'BccLabel', 'BccImportant', 'BccTrash', 'BccDelete']
+        fields = ['BccLabel', 'BccImportant', 'BccTrash']

@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Email(models.Model):
-    Sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', blank=True, null=True)
-    Receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', blank=True, null=True)
+    Sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', blank=False)
+    Receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', blank=False)
     Cc = models.ManyToManyField(User, related_name='carboncopy', blank=True)
     Bcc = models.ManyToManyField(User, related_name='blindcarboncopy', blank=True)
     Subject = models.CharField(max_length=100)
