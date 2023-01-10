@@ -4,4 +4,3 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from .serializers import *
 from .models import *
 from django.contrib.auth.models import User
-
