@@ -14,7 +14,7 @@ class TodoListCreateAPI(ListCreateAPIView):
 
     def list(self, request, *args, **kwargs):
         user = request.user
-        serializer = TodoDetailSerializer(self.get_queryset(), many=True)
+        serializer = TodoDetailSerializer(self.get_queryset().order_by('-id'), many=True)
 
         if user.is_superuser:
             return Response({
@@ -92,18 +92,23 @@ class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
                         'data': serializer.errors})
             elif request.user == todo.Assignee:
                 serializer = TodoAssigneeSerializer(todo, data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    serializer = TodoDetailSerializer(serializer.instance)
-                    return Response({
-                        'status': True, 
-                        'message': 'Todo updated successfully', 
-                        'data': serializer.data})
-                else:
+                if todo.Completed == True:
                     return Response({
                         'status': False, 
-                        'message': 'Todo not updated', 
-                        'data': serializer.errors})
+                        'message': 'Todo already completed'})
+                else:
+                    if serializer.is_valid():
+                        serializer.save()
+                        serializer = TodoDetailSerializer(serializer.instance)
+                        return Response({
+                            'status': True, 
+                            'message': 'Todo updated successfully', 
+                            'data': serializer.data})
+                    else:
+                        return Response({
+                            'status': False, 
+                            'message': 'Todo not updated', 
+                            'data': serializer.errors})
             else:
                 return Response({
                     'status': False, 
