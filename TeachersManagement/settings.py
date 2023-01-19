@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'django_cleanup.apps.CleanupConfig',
     'django_rest_passwordreset',
     'corsheaders',
-    'channels',
 ]
 
 
@@ -183,11 +182,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-
-# Channels settings
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
