@@ -24,17 +24,18 @@ class SentEmailDetailSerializer(serializers.ModelSerializer):
 
 
 
+
 # For receiver
 class ReceiverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'ReceiverLabel', 'ReceiverImportant', 'ReceiverTrash', 'ReceiverDelete']
+        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'Draft', 'ReceiverLabel', 'ReceiverImportant', 'ReceiverRead', 'ReceiverTrash', 'ReceiverDelete']
 
 
 class ReceiverUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['ReceiverLabel', 'ReceiverImportant', 'ReceiverTrash']
+        fields = ['ReceiverRead', 'ReceiverLabel', 'ReceiverImportant', 'ReceiverTrash']
 
 
 
@@ -44,13 +45,13 @@ class ReceiverUpdateSerializer(serializers.ModelSerializer):
 class CcSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'CcLabel', 'CcImportant', 'CcTrash', 'CcDelete']
+        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'Draft', 'CcLabel', 'CcImportant', 'CcRead', 'CcTrash', 'CcDelete']
 
 
 class CcUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['CcLabel', 'CcImportant', 'CcTrash']
+        fields = ['CcLabel', 'CcImportant', 'CcRead', 'CcTrash']
 
 
 
@@ -60,10 +61,10 @@ class CcUpdateSerializer(serializers.ModelSerializer):
 class BccSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'BccLabel', 'BccImportant', 'BccTrash', 'BccDelete']
+        fields = ['id', 'Sender', 'Receiver', 'Cc', 'Subject', 'Body', 'Date', 'Draft', 'BccLabel', 'BccImportant', 'BccRead', 'BccTrash', 'BccDelete']
 
 
 class BccUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
-        fields = ['BccLabel', 'BccImportant', 'BccTrash']
+        fields = ['BccLabel', 'BccImportant', 'BccRead', 'BccTrash']

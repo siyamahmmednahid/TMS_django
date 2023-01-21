@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
 from .serializers import *
 from .models import *
 from django.contrib.auth.models import User
@@ -204,6 +204,55 @@ class SentEmailListAPIView(ListCreateAPIView):
                 'status': False,
                 'message': 'Email not sent',
                 'data': serializer.errors})
+        
+
+# For draft email resend API
+class DraftEmailResendAPIView(RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, pk):
+        try:
+            user = request.user
+            email = Email.objects.get(id=pk)
+            serializer = SentEmailSerializer(email)
+            if email.Sender == user:
+                return Response({
+                    'status': True,
+                    'message': 'Draft email detail',
+                    'data': serializer.data})
+            else:
+                return Response({
+                    'status': False,
+                    'message': 'You are not the sender of this email'})
+        except:
+            return Response({
+                'status': False,
+                'message': 'Email not found'})
+        
+    def update(self, request, pk):
+        try:
+            user = request.user
+            email = Email.objects.get(id=pk)
+            data = request.data
+            serializer = SentEmailSerializer(email, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                serializer = SentEmailDetailSerializer(serializer.instance)
+                return Response({
+                    'status': True,
+                    'message': 'Draft email sent successfully',
+                    'data': serializer.data})
+            else:
+                return Response({
+                    'status': False,
+                    'message': 'Draft email not sent',
+                    'data': serializer.errors})
+        except:
+            return Response({
+                'status': False,
+                'message': 'Email not found'})
+    
+
 
 
 # For sent email detail, update and delete API
