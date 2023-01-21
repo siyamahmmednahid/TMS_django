@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Email(models.Model):
     Sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', blank=False)
-    # Receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', blank=False)
     Receiver = models.ManyToManyField(User, related_name='receiver', blank=True)
     Cc = models.ManyToManyField(User, related_name='carboncopy', blank=True)
     Bcc = models.ManyToManyField(User, related_name='blindcarboncopy', blank=True)
