@@ -62,6 +62,8 @@ class UserSignUpAPI(generics.CreateAPIView):
     def post(self, request, format=None):
         data = request.data
         username = data['username']
+        first_name = data['first_name']
+        last_name = data['last_name']
         email = data['email']
         password1 = data['password1']
         password2 = data['password2']
@@ -97,13 +99,14 @@ class UserSignUpAPI(generics.CreateAPIView):
                     'message': 'Password does not match'
                 })
             else:
-                user = User.objects.create_user(username=username, email=email, password=password1)
+                user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password1)
                 user.save()
                 return Response({
                     'status': True,
                     'message': 'User created successfully',
                     'data': {
                         'username': username,
+                        'name': first_name + ' ' + last_name,
                         'email': email,
                         'password': password1
                     }
