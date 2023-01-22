@@ -10,3 +10,30 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        fields = ['id', 'is_superuser', 'is_active', 'username', 'first_name', 'last_name', 'email']
+
+
+
+# For todo serializer
+class TodoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = ['id', 'TaskCompleted', 'user', 'Assignee']
+
+class MyTodoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = ['id', 'TaskCompleted', 'Assignee']
+
+class SupervisorTodoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = ['id', 'TaskCompleted', 'user']
+
+
+
+# For event serializer
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id', 'EndDateTime']
