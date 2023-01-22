@@ -14,21 +14,21 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
+
+
 # For todo serializer
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
-        fields = ['id', 'TaskCompleted', 'user', 'Assignee']
-
-class MyTodoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Todo
         fields = ['id', 'TaskCompleted', 'Assignee']
+
 
 class SupervisorTodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
         fields = ['id', 'TaskCompleted', 'user']
+
+
 
 
 

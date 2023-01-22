@@ -28,7 +28,7 @@ class TodoListAPIView(ListAPIView):
         serializer = TodoSerializer(Todo.objects.all(), many=True)
         return Response({
             'status': True, 
-            'message': 'Todo list', 
+            'message': 'Teacher rank list', 
             'data': serializer.data})
     
 
@@ -41,7 +41,7 @@ class SupervisorTodoListAPIView(ListAPIView):
         serializer = SupervisorTodoSerializer(Todo.objects.filter(user=user), many=True)
         return Response({
             'status': True,
-            'message': 'Todo list',
+            'message': 'Me as Supervisor list',
             'data': serializer.data})
     
 
@@ -51,10 +51,10 @@ class MyTodoListAPIView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         user = request.user
-        serializer = MyTodoSerializer(Todo.objects.filter(Assignee=user), many=True)
+        serializer = TodoSerializer(Todo.objects.filter(Assignee=user), many=True)
         return Response({
             'status': True,
-            'message': 'Todo list',
+            'message': 'My task list',
             'data': serializer.data})
     
 
