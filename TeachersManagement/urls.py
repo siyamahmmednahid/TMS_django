@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('rest_framework.urls')),
     path('api/auth/', include('AuthenticationApp.urls')),
+    path('api/home/', include('HomeApp.urls')),
     path('api/chat/', include('ChatApp.urls')),
     path('api/email/', include('EmailApp.urls')),
     path('api/event/', include('EventApp.urls')),
