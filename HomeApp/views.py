@@ -33,6 +33,9 @@ class TodoListAPIView(ListAPIView):
     
 
 
+
+
+# For supervisor list API
 class SupervisorTodoListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -46,6 +49,9 @@ class SupervisorTodoListAPIView(ListAPIView):
     
 
 
+
+
+# For teacher list API
 class MyTodoListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
 

@@ -28,6 +28,9 @@ class EmailListAPIView(ListAPIView):
 
 
 
+
+
+# For email detail and email update API
 class EmailDetailAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -204,7 +207,10 @@ class SentEmailListAPIView(ListCreateAPIView):
                 'status': False,
                 'message': 'Email not sent',
                 'data': serializer.errors})
-        
+
+
+
+
 
 # For draft email resend API
 class DraftEmailResendAPIView(RetrieveUpdateAPIView):
@@ -252,6 +258,7 @@ class DraftEmailResendAPIView(RetrieveUpdateAPIView):
                 'status': False,
                 'message': 'Email not found'})
     
+
 
 
 
