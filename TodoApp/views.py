@@ -7,7 +7,7 @@ from .models import *
 from .serializers import *
 from django.contrib.auth.models import User
 
-
+# For Todo list and create API
 class TodoListCreateAPI(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Todo.objects.all()
@@ -49,6 +49,9 @@ class TodoListCreateAPI(ListCreateAPIView):
 
 
 
+
+
+# For Todo detail, update and delete API
 class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Todo.objects.all()

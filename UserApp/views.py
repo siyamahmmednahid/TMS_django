@@ -8,8 +8,6 @@ from .models import *
 
 
 
-
-
 # Users List API
 class UserListAPI(ListAPIView):
     permission_classes = [IsAuthenticated]
