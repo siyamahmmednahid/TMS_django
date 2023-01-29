@@ -35,6 +35,7 @@ class UserListAPI(ListAPIView):
 
 
 
+
 # User Detail API
 class UserDetailAPI(RetrieveUpdateAPIView):
     queryset = User.objects.all()
