@@ -158,7 +158,7 @@ class UserAcademicInfoListCreateAPI(ListCreateAPIView):
     serializer_class = AcademicInfoSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = AcademicInfo.objects.all()
+        queryset = AcademicInfo.objects.all().order_by('-id')
         serializer = AcademicInfoDetailSerializer(queryset, many=True)
         return Response({'Status': True, 'message': 'Academic info list', 'data': serializer.data})
 
