@@ -37,3 +37,23 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ['id', 'EndDateTime']
+
+
+
+
+
+# For teacher rank serializer
+class TeacherRankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = ['id', 'TaskCompleted', 'Assignee']
+
+
+
+
+
+# For user list dropdown serializer
+class UserListDropdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'is_superuser']
