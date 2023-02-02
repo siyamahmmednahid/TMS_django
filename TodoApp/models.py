@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Todo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    Title = models.CharField(max_length=100)
+    Title = models.CharField(max_length=200)
     Assignee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='Assignee_set')
     DueDate = models.DateField()
     Priority_Choices = (

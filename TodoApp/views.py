@@ -102,7 +102,7 @@ class TodoDetailAPI(RetrieveUpdateDestroyAPIView):
                 else:
                     if serializer.is_valid():
                         serializer.save()
-                        serializer = TodoDetailSerializer(serializer.instance)
+                        serializer = TodoAssigneeSerializer(serializer.instance)
                         return Response({
                             'status': True, 
                             'message': 'Todo updated successfully', 

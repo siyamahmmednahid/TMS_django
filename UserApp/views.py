@@ -5,6 +5,8 @@ from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIVie
 from django.contrib.auth.models import User
 from .serializers import *
 from .models import *
+from TodoApp.models import *
+from EmailApp.models import *
 
 
 
@@ -83,6 +85,25 @@ class UserDetailAPI(RetrieveUpdateAPIView):
                 return Response({'status': False, 'message': 'You are not authorized to update this user'})
         except:
             return Response({'status': False, 'message': 'No user found'})
+        
+
+
+
+
+# User incomplete todo count API
+# class UserIncompleteTodoCountAPI(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, pk):
+#         try:
+#             user = User.objects.get(id=pk)
+#             if Todo.objects.filter(user=user, is_completed=False).exists():
+#                 todo = Todo.objects.filter(user=user, is_completed=False)
+#                 return Response({'status': True, 'message': 'Incomplete todo count', 'data': todo.count()})
+#             else:
+#                 return Response({'status': False, 'message': 'No incomplete todo found'})
+#         except:
+#             return Response({'status': False, 'message': 'No user found'})
 
 
      
