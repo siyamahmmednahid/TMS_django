@@ -130,9 +130,9 @@ class UserDeactivateAPI(UpdateAPIView):
             if request.user.is_superuser:
                 if serializer.is_valid():
                     serializer.save()
-                    return Response({'status': True, 'message': 'User deactivated successfully'})
+                    return Response({'status': True, 'message': 'Update successfully'})
                 else:
-                    return Response({'status': False, 'message': 'User not deactivated', 'data': serializer.errors})
+                    return Response({'status': False, 'message': 'Update failed', 'data': serializer.errors})
             else:
                 return Response({'status': False, 'message': 'You are not authorized to deactivate this user'})
         except:

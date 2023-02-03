@@ -77,7 +77,7 @@ class UserSignUpAPI(generics.CreateAPIView):
                 return False
             return True
 
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.is_staff:
             if User.objects.filter(username=username).exists():
                 return Response({
                     'status': False,
