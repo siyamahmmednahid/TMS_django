@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
 from django.contrib.auth.models import User
 from .serializers import *
 from .models import *
@@ -91,23 +91,56 @@ class UserDetailAPI(RetrieveUpdateAPIView):
 
 
 # User incomplete todo count API
-# class UserIncompleteTodoCountAPI(APIView):
-#     permission_classes = [IsAuthenticated]
+class UserIncompleteTodoCountAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        Assignee = User.objects.get(id=pk)
+        incompleteTasks = Todo.objects.filter(Assignee=Assignee, TaskCompleted=False).count()
+        return Response({'status': True, 'message': 'Incomplete tasks count', 'data': incompleteTasks})
+    
 
-#     def get(self, request, pk):
-#         try:
-#             user = User.objects.get(id=pk)
-#             if Todo.objects.filter(user=user, is_completed=False).exists():
-#                 todo = Todo.objects.filter(user=user, is_completed=False)
-#                 return Response({'status': True, 'message': 'Incomplete todo count', 'data': todo.count()})
-#             else:
-#                 return Response({'status': False, 'message': 'No incomplete todo found'})
-#         except:
-#             return Response({'status': False, 'message': 'No user found'})
+
+
+
+# User unread email count API
+class UserUnreadEmailCountAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        user = User.objects.get(id=pk)
+        toReadEmails = Email.objects.filter(Receiver=user, ReceiverRead=False).count()
+        ccReadEmails = Email.objects.filter(Cc=user, CcRead=False).count()
+        bccReadEmails = Email.objects.filter(Bcc=user, BccRead=False).count()
+        unreadEmails = toReadEmails + ccReadEmails + bccReadEmails
+        return Response({'status': True, 'message': 'Unread emails count', 'data': unreadEmails})
+    
+
+
+
+
+# User deactivate API
+class UserDeactivateAPI(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, pk):
+        try:
+            user = User.objects.get(id=pk)
+            serializer = UserDeactiveSerializer(user, data=request.data)
+            if request.user.is_superuser:
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({'status': True, 'message': 'User deactivated successfully'})
+                else:
+                    return Response({'status': False, 'message': 'User not deactivated', 'data': serializer.errors})
+            else:
+                return Response({'status': False, 'message': 'You are not authorized to deactivate this user'})
+        except:
+            return Response({'status': False, 'message': 'No user found'})
+
 
 
      
-
 
 # User personal info add API
 class UserPersonalInfoAddAPI(CreateAPIView):

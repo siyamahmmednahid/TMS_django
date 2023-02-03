@@ -21,6 +21,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ['email', 'first_name', 'last_name']
 
 
+# For user deactive serializer
+class UserDeactiveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['is_active']
+
 
 
 

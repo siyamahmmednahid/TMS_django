@@ -10,6 +10,11 @@ urlpatterns = [
     path('personalinfo/<int:pk>/', UserPersonalInfoAPI.as_view()),
 
 
+    path('taskCount/<int:pk>/', UserIncompleteTodoCountAPI.as_view()),
+    path('emailCount/<int:pk>/', UserUnreadEmailCountAPI.as_view()),
+    path('userDeactivate/<int:pk>/', UserDeactivateAPI.as_view()),
+
+
     path('academicinfo/', UserAcademicInfoListCreateAPI.as_view()),
     path('academicinfo/<int:pk>/', UserAcademicInfoAPI.as_view()),
 
